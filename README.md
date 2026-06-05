@@ -4,9 +4,9 @@
 
 ---
 
-## 📊 1. Το Dataset (Data Preparation)
+##  1. Το Dataset (Data Preparation)
 Για τις ανάγκες της εφαρμογής χρησιμοποιήθηκε ένα πραγματικό dataset από το Kaggle:
-🔗 [Kaggle Dataset: Would You Rather](https://www.kaggle.com/datasets/charlieray668/would-you-rather)
+ [Kaggle Dataset: Would You Rather](https://www.kaggle.com/datasets/charlieray668/would-you-rather)
 
 ### Διαδικασία Επεξεργασίας (Data Cleaning):
 Το αρχικό αρχείο ήταν σε μορφή `.csv` και περιείχε στήλες με έτοιμα στατιστικά ψήφων (`votes_a`, `votes_b`) τα οποία έπρεπε να αφαιρεθούν, καθώς η εφαρμογή μας έπρεπε να ξεκινάει με μηδενικούς ψήφους για να καταγράφει τη δική της live δραστηριότητα.
