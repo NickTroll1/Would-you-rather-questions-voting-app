@@ -1,4 +1,4 @@
-# Would You Rather? - Scalable Cloud Application 🚀
+# Would You Rather? - Scalable Cloud Application
 
 Αυτή η εφαρμογή υλοποιήθηκε στα πλαίσια του μαθήματος Cloud Computing. Πρόκειται για ένα data-driven microservices web application (βασισμένο σε real-world dataset) το οποίο είναι πλήρως **scalable** και έχει σχεδιαστεί για να εκτελείται μέσα σε ένα **Kubernetes (K8s)** cluster.
 
