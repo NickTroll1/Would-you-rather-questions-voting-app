@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Would You Rather?</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f2f5; margin-top: 50px; }
+        .container { display: flex; width: 80%; max-width: 800px; height: 250px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+        .option-btn { flex: 1; border: none; font-size: 1.4rem; font-weight: bold; color: white; cursor: pointer; padding: 20px; }
+        .option-a { background-color: #ff4757; }
+        .option-b { background-color: #1e90ff; }
+        .divider { background: #333; color: white; display: flex; align-items: center; justify-content: center; width: 60px; font-weight: bold; }
+        .thank-you-box { text-align: center; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 500px; width: 90%; }
+        .btn-restart { display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #2ed573; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.1rem; }
+        .btn-restart:hover { background-color: #26af5f; }
+    </style>
+</head>
+<body>
+    {% if finished %}
+        <div class="thank-you-box">
+            <h1>Thank You!</h1>
+            <p style="font-size: 1.2rem; color: #555;">You have successfully completed all 10 questions of the survey.</p>
+            <a href="/restart" class="btn-restart">Start Again</a>
+        </div>
+    {% else %}
+        <h1>Would you rather...</h1>
+        <form action="/vote" method="POST" class="container">
+            <input type="hidden" name="question_id" value="{{ q.id }}">
+            <button type="submit" name="vote" value="A" class="option-btn option-a">{{ q.option_a }}</button>
+            <div class="divider">OR</div>
+            <button type="submit" name="vote" value="B" class="option-btn option-b">{{ q.option_b }}</button>
+        </form>
+    {% endif %}
+</body>
+</html>
