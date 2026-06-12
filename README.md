@@ -58,5 +58,5 @@ docker run -d -p 8080:8080 --name live-voting-app voting-app:v1
 **Εκτέλεση Tests τοπικά:**
 
 ```bash
-pytest
+pytest3 -m pytest test_app.py
 ```
