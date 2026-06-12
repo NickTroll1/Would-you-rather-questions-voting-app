@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16
+    container_name: votedb
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: votedb
+      POSTGRES_USER: voteuser
+      POSTGRES_PASSWORD: votepass
+    volumes:
+      - votedb-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voteuser -d votedb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    image: voting-app:v1
+    container_name: live-voting-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_NAME: votedb
+      DB_USER: voteuser
+      DB_PASSWORD: votepass
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  votedb-data:
