@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Αποτελέσματα Ψηφοφορίας</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; color: #333; }
+    h1 { font-size: 1.6rem; margin-bottom: 8px; }
+    .meta { font-size: 0.85rem; color: #888; margin-bottom: 32px; }
+    .card { background: white; border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .question-num { font-size: 0.8rem; color: #aaa; margin-bottom: 6px; }
+    .options { display: flex; gap: 16px; margin-top: 12px; }
+    .option { flex: 1; }
+    .option-label { font-size: 0.85rem; color: #888; margin-bottom: 4px; }
+    .option-text { font-weight: 500; margin-bottom: 6px; }
+    .bar-wrap { background: #eee; border-radius: 6px; height: 10px; overflow: hidden; }
+    .bar { height: 10px; border-radius: 6px; }
+    .bar-a { background: #4f8ef7; }
+    .bar-b { background: #f7854f; }
+    .vote-count { font-size: 0.85rem; color: #666; margin-top: 4px; }
+    a { display: inline-block; margin-top: 32px; color: #4f8ef7; text-decoration: none; font-size: 0.9rem; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>📊 Αποτελέσματα Ψηφοφορίας</h1>
+  <div class="meta">Served by: {{ served_by }} &nbsp;|&nbsp; v{{ version }}</div>
+
+  {% for q in questions %}
+  {% set total = q.votes_a + q.votes_b %}
+  {% set pct_a = ((q.votes_a / total * 100) | round(1)) if total > 0 else 50 %}
+  {% set pct_b = ((q.votes_b / total * 100) | round(1)) if total > 0 else 50 %}
+  <div class="card">
+    <div class="question-num">Ερώτηση #{{ q.id }}</div>
+    <div class="options">
+      <div class="option">
+        <div class="option-label">Επιλογή Α</div>
+        <div class="option-text">{{ q.option_a }}</div>
+        <div class="bar-wrap"><div class="bar bar-a" style="width: {{ pct_a }}%"></div></div>
+        <div class="vote-count">{{ q.votes_a }} ψήφοι ({{ pct_a }}%)</div>
+      </div>
+      <div class="option">
+        <div class="option-label">Επιλογή Β</div>
+        <div class="option-text">{{ q.option_b }}</div>
+        <div class="bar-wrap"><div class="bar bar-b" style="width: {{ pct_b }}%"></div></div>
+        <div class="vote-count">{{ q.votes_b }} ψήφοι ({{ pct_b }}%)</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <a href="/">← Πίσω στην εφαρμογή</a>
+</body>
+</html>

@@ -106,6 +106,27 @@ def vote():
     session['current_index'] = session.get('current_index', 0) + 1
     return redirect(url_for('index'))
 
+#gia na vlepoyme tis psifoys
+@app.get("/stats")
+def stats():
+    try:
+        with db_connect() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT q.id, q.option_a, q.option_b,
+                    COUNT(CASE WHEN v.vote = 'A' THEN 1 END) AS votes_a,
+                    COUNT(CASE WHEN v.vote = 'B' THEN 1 END) AS votes_b
+                FROM questions q
+                LEFT JOIN votes v ON v.question_id = q.id
+                WHERE q.id <= 10
+                GROUP BY q.id, q.option_a, q.option_b
+                ORDER BY q.id;
+            """)
+            results = cur.fetchall()
+        return render_template('stats.html', questions=results, served_by=socket.gethostname(), version=APP_VERSION)
+    except Exception as exc:
+        return jsonify(error=str(exc)[:200]), 500
+
+
 @app.get("/restart")
 def restart():
     session['current_index'] = 0
