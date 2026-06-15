@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: voting-app
+spec:
+  selector:
+    app: voting-app
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort

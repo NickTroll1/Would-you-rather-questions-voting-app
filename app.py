@@ -32,13 +32,13 @@ def init_db():
                 );
             ''')
             conn.commit()
-            
+
             cur.execute("SELECT COUNT(*) FROM questions;")
             if cur.fetchone()[0] == 0:
                 with open('questions.json', 'r', encoding='utf-8') as f:
                     all_questions = json.load(f)
                     for q in all_questions[:10]:
-                        cur.execute("INSERT INTO questions (option_a, option_b) VALUES (%s, %s);", 
+                        cur.execute("INSERT INTO questions (option_a, option_b) VALUES (%s, %s);",
                                     (q.get('optionA'), q.get('optionB')))
                 conn.commit()
     except Exception as e:
@@ -70,24 +70,24 @@ def version():
 @app.get("/")
 def index():
     served_by = socket.gethostname()
-    
+
     if 'current_index' not in session:
         session['current_index'] = 0
-        
+
     if session['current_index'] >= 10:
         return render_template('ui.html', finished=True, served_by=served_by, version=APP_VERSION)
-        
+
     try:
         with db_connect() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT * FROM questions ORDER BY id;")
             questions = cur.fetchall()
-            
+
         if session['current_index'] >= len(questions):
             return render_template('ui.html', finished=True, served_by=served_by, version=APP_VERSION)
-            
+
         current_question = questions[session['current_index']]
         return render_template('ui.html', q=current_question, finished=False, served_by=served_by, version=APP_VERSION)
-        
+
     except Exception as exc:
         return jsonify(error=str(exc)[:200], served_by=served_by), 500
 
@@ -95,14 +95,14 @@ def index():
 def vote():
     question_id = request.form.get('question_id')
     user_vote = request.form.get('vote')
-    
+
     try:
         with db_connect() as conn, conn.cursor() as cur:
             cur.execute("INSERT INTO votes (question_id, vote) VALUES (%s, %s);", (question_id, user_vote))
             conn.commit()
     except Exception as e:
         print(f"Failed to log vote: {e}", flush=True)
-        
+
     session['current_index'] = session.get('current_index', 0) + 1
     return redirect(url_for('index'))
 
@@ -126,10 +126,15 @@ def stats():
     except Exception as exc:
         return jsonify(error=str(exc)[:200]), 500
 
-
 @app.get("/restart")
 def restart():
     session['current_index'] = 0
+    try:
+        with db_connect() as conn, conn.cursor() as cur:
+            cur.execute("DELETE FROM votes;")
+            conn.commit()
+    except Exception as e:
+        print(f"Failed to clear votes: {e}", flush=True)
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
