@@ -33,7 +33,7 @@
 
 ### Οδηγίες Χρήσης (Docker)
 
-**1. Δημιουργία (Build) της Docker εικόνας:**
+**1. Δημιουργία (Build) της Docker Image:**
 
 ```bash
 docker build -t voting-app:v1 .
