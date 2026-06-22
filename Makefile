@@ -38,7 +38,7 @@ deploy:
 	sed "s|REPLACE_ME_USER/would-you-rather:0.1.0|$(IMAGE)|g" k8s/06-deployment-app.yaml | kubectl apply -f -
 	kubectl apply -f k8s/07-service-app.yaml
 	kubectl rollout status deployment/voting-app --timeout=180s
-	@echo "Done! Use: kubectl port-forward svc/voting-app 8080:80"
+	@echo "Use: kubectl port-forward svc/voting-app 8080:80"
 
 status:
 	kubectl get deployments
