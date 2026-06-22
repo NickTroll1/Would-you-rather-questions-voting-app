@@ -150,6 +150,106 @@ kubectl port-forward svc/voting-app 8080:80
 minikube service voting-app
 ```
 
+## 5.1 Προαπαιτούμενα
+
+Για την εκτέλεση της εφαρμογής στο Kubernetes cluster της σχολής απαιτούνται:
+
+* Ενεργή σύνδεση στο VPN της σχολής.
+* Το αρχείο ρυθμίσεων πρόσβασης (`kubeconfig`) που παρέχεται από το εργαστήριο, τοποθετημένο στη διαδρομή:
+
+```text id="2wq6wq"
+~/.kube/config
+```
+
+* Εγκατεστημένα τοπικά τα εργαλεία `kubectl` και `make`.
+
+## 5.2 Βήματα Εγκατάστασης (Step-by-Step)
+
+### Βήμα 1: Clone του Repository
+
+```bash id="0rzf5j"
+git clone <repository-url>
+cd <repository-directory>
+```
+
+### Βήμα 2: Έλεγχος Σύνδεσης με το Cluster
+
+Βεβαιωθείτε ότι το `kubectl` επικοινωνεί σωστά με το Kubernetes cluster της σχολής:
+
+```bash id="3pygsk"
+kubectl config current-context
+```
+
+### Βήμα 3: Αυτοματοποιημένο Deployment
+
+Χάρη στο `Makefile`, δεν απαιτείται η χειροκίνητη εκτέλεση των επιμέρους αρχείων YAML. Η εγκατάσταση πραγματοποιείται με μία μόνο εντολή:
+
+```bash id="vw7nxy"
+make deploy
+```
+
+#### Τι εκτελείται στο παρασκήνιο;
+
+1. Δημιουργείται το αποθηκευτικό μέσο (`PersistentVolumeClaim`).
+2. Δημιουργούνται οι ρυθμίσεις της εφαρμογής (`ConfigMap` και `Secret`).
+3. Εκκινείται η PostgreSQL.
+4. Μόλις η βάση περάσει επιτυχώς τα `readiness probes`, το cluster κατεβάζει το έτοιμο image από το Docker Hub (`nikolasmin/would-you-rather:0.1.0`).
+5. Εκκινούνται τα `3 replicas` της εφαρμογής Flask.
+
+## 5.3 Έλεγχος Κατάστασης των Resources
+
+H κατάσταση των resources του namespace μπορεί να ελεγχθεί με την εντολή:
+
+```bash id="vtjlwm"
+kubectl get nodes
+```
+H
+
+```bash id="d8t3y4"
+make status
+```
+
+Όλα τα Pods της εφαρμογής (`3 replicas`) καθώς και το Pod της βάσης δεδομένων πρέπει να εμφανίζουν κατάσταση:
+
+```text id="nkp4nn"
+STATUS: Running
+```
+
+## 5.4 Live Πρόσβαση μέσω του VPN της Σχολής
+
+Λόγω της χρήσης `NodePort Service` στην πόρτα `30080` και των εσωτερικών DNS εγγραφών του εργαστηρίου, η εφαρμογή είναι μόνιμα προσβάσιμη σε οποιονδήποτε είναι συνδεδεμένος στο VPN της σχολής.
+
+### Πρόσβαση στην εφαρμογή
+
+```text id="9g7fka"
+http://source-code-master.cluster.local:30080/
+```
+
+H και με την ip που εμφανιζεται οταν εκτελεις την εντολη:
+
+```bash id="vtjlwm"
+ping source-code-master.cluster.local
+```
+
+### Στατιστικά και Πληροφορίες Replicas
+
+```text id="efm2qx"
+http://source-code-master.cluster.local:30080/stats
+```
+
+Το endpoint `/stats` εμφανίζει σε πραγματικό χρόνο πληροφορίες σχετικά με την κατάσταση της εφαρμογής, συμπεριλαμβανομένου του συγκεκριμένου Pod (Hostname) που εξυπηρέτησε το αίτημα. Με αυτόν τον τρόπο μπορεί να παρατηρηθεί στην πράξη η λειτουργία των πολλαπλών replicas και του μηχανισμού load balancing του Kubernetes.
+
+## 5.5 Καθαρισμός και Απεγκατάσταση των Resources
+
+Μετά την ολοκλήρωση της παρουσίασης ή των δοκιμών, όλα τα resources μπορούν να διαγραφούν από το cluster με μία μόνο εντολή:
+
+```bash id="w3mpsa"
+make clean
+```
+
+Η εντολή διαγράφει τα Deployments, Services, ConfigMaps, Secrets και τα υπόλοιπα Kubernetes resources που δημιουργήθηκαν κατά τη διαδικασία εγκατάστασης.
+
+
 ---
 
 ## 6. Makefile – Αυτοματοποίηση
