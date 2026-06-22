@@ -239,6 +239,11 @@ http://source-code-master.cluster.local:30080/stats
 
 Το endpoint `/stats` εμφανίζει σε πραγματικό χρόνο πληροφορίες σχετικά με την κατάσταση της εφαρμογής, συμπεριλαμβανομένου του συγκεκριμένου Pod (Hostname) που εξυπηρέτησε το αίτημα. Με αυτόν τον τρόπο μπορεί να παρατηρηθεί στην πράξη η λειτουργία των πολλαπλών replicas και του μηχανισμού load balancing του Kubernetes.
 
+| Service | URL |
+|---------|-----|
+| Εφαρμογή | [http://source-code-master.cluster.local:30080/](http://source-code-master.cluster.local:30080/) |
+| Στατιστικά | [http://source-code-master.cluster.local:30080/stats/](http://source-code-master.cluster.local:30080/stats/) |
+
 ## 5.5 Καθαρισμός και Απεγκατάσταση των Resources
 
 Μετά την ολοκλήρωση της παρουσίασης ή των δοκιμών, όλα τα resources μπορούν να διαγραφούν από το cluster με μία μόνο εντολή:
