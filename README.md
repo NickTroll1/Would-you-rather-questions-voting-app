@@ -34,7 +34,7 @@
 │   └── stats.html          # Σελίδα αποτελεσμάτων
 └── k8s/
     ├── 01-configmap.yaml   # Μη-ευαίσθητες ρυθμίσεις DB
-    ├── 02-secret.yaml      # DB password (⚠ μην το commit σε production)
+    ├── 02-secret.yaml      # DB password (καθαρα και μονο για την εργασια, οχι για production)
     ├── 03-pvc.yaml         # PersistentVolumeClaim 1Gi για την DB
     ├── 04-deployment-db.yaml   # PostgreSQL Deployment
     ├── 05-service-db.yaml      # ClusterIP Service για την DB
