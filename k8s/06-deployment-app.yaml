@@ -5,7 +5,6 @@ metadata:
   labels:
     app: voting-app
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app: voting-app
@@ -16,7 +15,6 @@ spec:
     spec:
       containers:
         - name: voting-app
-          # The Makefile rewrites this placeholder with your DOCKER_USER and VERSION.
           image: REPLACE_ME_USER/would-you-rather:0.1.0
           imagePullPolicy: Always
           ports:
@@ -49,7 +47,7 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 64Mi
+              memory: 128Mi
             limits:
               cpu: 200m
               memory: 256Mi
