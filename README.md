@@ -40,6 +40,7 @@
     ├── 05-service-db.yaml      # ClusterIP Service για την DB
     ├── 06-deployment-app.yaml  # voting-app Deployment (3 replicas)
     └── 07-service-app.yaml     # NodePort Service (port 30080)
+    └── 08-hpa.yaml             # HorizontalPodAutoscaler (2–10 replicas)
 ```
 
 ---
@@ -128,8 +129,9 @@ docker compose down
 | `03-pvc.yaml` | PersistentVolumeClaim 1Gi για τα δεδομένα της PostgreSQL |
 | `04-deployment-db.yaml` | PostgreSQL 16 με liveness/readiness probes και resource limits |
 | `05-service-db.yaml` | ClusterIP Service – η DB δεν εκτίθεται εκτός cluster |
-| `06-deployment-app.yaml` | voting-app με **3 replicas**, probes σε `/healthz` και `/readyz` |
+| `06-deployment-app.yaml` | voting-app, probes σε `/healthz` και `/readyz` |
 | `07-service-app.yaml` | NodePort (30080) με `sessionAffinity: ClientIP` για σταθερό session |
+| `08-hpa.yaml` | HorizontalPodAutoscaler – αυτόματη κλιμάκωση 2–10 replicas βάσει CPU/Memory |
 
 > Το `sessionAffinity: ClientIP` στο `07-service-app.yaml` εξασφαλίζει ότι ο ίδιος χρήστης
 > εξυπηρετείται πάντα από το ίδιο replica, ώστε να μη χάνεται το Flask session κατά το load balancing.
@@ -194,7 +196,8 @@ make deploy
 2. Δημιουργούνται οι ρυθμίσεις της εφαρμογής (`ConfigMap` και `Secret`).
 3. Εκκινείται η PostgreSQL.
 4. Μόλις η βάση περάσει επιτυχώς τα `readiness probes`, το cluster κατεβάζει το έτοιμο image από το Docker Hub (`nikolasmin/would-you-rather:0.1.0`).
-5. Εκκινούνται τα `3 replicas` της εφαρμογής Flask.
+5. Εκκινούνται τα replicas της εφαρμογής Flask (αρχικά 2, με αυτόματη κλιμάκωση έως 10 μέσω του HPA).
+6. Ενεργοποιείται ο HorizontalPodAutoscaler που παρακολουθεί CPU (>60%) και Memory (>70%) και προσαρμόζει αυτόματα τον αριθμό των Pods.
 
 ## 5.3 Έλεγχος Κατάστασης των Resources
 
@@ -209,7 +212,7 @@ H
 make status
 ```
 
-Όλα τα Pods της εφαρμογής (`3 replicas`) καθώς και το Pod της βάσης δεδομένων πρέπει να εμφανίζουν κατάσταση:
+Όλα τα Pods της εφαρμογής (τουλάχιστον 2 replicas, με δυνατότητα αυτόματης κλιμάκωσης έως 10 μέσω του HPA) καθώς και το Pod της βάσης δεδομένων πρέπει να εμφανίζουν κατάσταση:
 
 ```text id="nkp4nn"
 STATUS: Running
@@ -268,6 +271,33 @@ make deploy
 
 Με τον τρόπο αυτό, η εφαρμογή ξεκινά από πλήρως καθαρή κατάσταση, έτοιμη για νέα καταγραφή ψήφων και στατιστικών.
 
+## 5.6 Autoscaling – HorizontalPodAutoscaler (HPA)
+
+Η εφαρμογή διαθέτει αυτόματη οριζόντια κλιμάκωση μέσω του 08-hpa.yaml. Το HPA παρακολουθεί σε πραγματικό χρόνο τη χρήση πόρων και προσαρμόζει δυναμικά τον αριθμό των Pods:
+
+### Παράμετροι HPA
+
+| Παράμετρος | Τιμή |
+|---|---|
+| Ελάχιστα Pods | `2` |
+| Μέγιστα Pods | `10` |
+| Trigger CPU | > 60% μέσης χρήσης |
+| Trigger Memory | > 70% μέσης χρήσης |
+| Scale Up | max +2 Pods ανά λεπτό |
+| Scale Down | max -1 Pod ανά λεπτό (μετά από 2 λεπτά σταθερότητας) |
+
+### Παρακολούθηση σε Πραγματικό Χρόνο
+
+Για να δεις την κατάσταση του HPA:
+
+```bash
+kubectl get hpa voting-app-hpa
+kubectl describe hpa voting-app-hpa
+```
+
+### Προαπαιτούμενο: Metrics Server
+
+Το HPA απαιτεί **Metrics Server** να τρέχει στο cluster.
 
 ---
 
