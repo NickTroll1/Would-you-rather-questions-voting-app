@@ -38,7 +38,7 @@
     ├── 03-pvc.yaml         # PersistentVolumeClaim 1Gi για την DB
     ├── 04-deployment-db.yaml   # PostgreSQL Deployment
     ├── 05-service-db.yaml      # ClusterIP Service για την DB
-    ├── 06-deployment-app.yaml  # voting-app Deployment (3 replicas)
+    ├── 06-deployment-app.yaml  # voting-app Deployment
     └── 07-service-app.yaml     # NodePort Service (port 30080)
     └── 08-hpa.yaml             # HorizontalPodAutoscaler (2–10 replicas)
 ```
